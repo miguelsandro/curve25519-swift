@@ -15,25 +15,25 @@ import Glibc
 infix operator >>> : BitwiseShiftPrecedence
 
 func getInt32(_ value: Int64) -> Int32 {
-	return Int32(truncatingBitPattern: value)
+    return Int32(truncatingBitPattern: value)
 }
 
 func >>> (lhs: Int, rhs: Int) -> Int {
   let l = getInt32(Int64(lhs))
-  let r = getInt32(Int64(rhs))  	
+  let r = getInt32(Int64(rhs))      
   return Int( Int32(bitPattern: UInt32(bitPattern: l) >> UInt32(r)) )
 }
 
 func gf() -> [Int64] {
-	return gf([0])
+    return gf([0])
 }
 
 func gf(_ ai: [Int64]) -> [Int64] {
-	var r = [Int64](repeating: 0, count: 16)
-	for i in 0..<ai.count {
-		r[i] = ai[i]
-	}
-	return r
+    var r = [Int64](repeating: 0, count: 16)
+    for i in 0..<ai.count {
+        r[i] = ai[i]
+    }
+    return r
 }
 
 var _0 = [Int](repeating: 0, count: 16)
@@ -84,10 +84,10 @@ func ts64(_ x: inout [Int], _ i: Int, _ h:Int, _ l:Int) {
 
 func vn(_ x:[Int], _ xi:Int, _ y:[Int], _ yi:Int, _ n:Int) -> Int {
     var d: Int = 0
-	for i in 0..<n {
-		d = d | ( x[xi+i] ^ y[yi+i] )
-	}
-	return (1 & ( (d - 1 ) >>> 8 ) ) - 1
+    for i in 0..<n {
+        d = d | ( x[xi+i] ^ y[yi+i] )
+    }
+    return (1 & ( (d - 1 ) >>> 8 ) ) - 1
 }
 
 func crypto_verify_32(_ x:[Int], _ xi:Int, _ y:[Int], _ yi:Int) -> Int {
@@ -95,9 +95,9 @@ func crypto_verify_32(_ x:[Int], _ xi:Int, _ y:[Int], _ yi:Int) -> Int {
 }
 
 func set25519(_ r:inout [Int64], _ a:[Int64]) {
-	for i in 0..<16 {
-		r[i] = a[i] | 0
-	}
+    for i in 0..<16 {
+        r[i] = a[i] | 0
+    }
 }
 
 func car25519(_ o:inout [Int64]) {
@@ -164,23 +164,23 @@ func par25519(_ a:[Int64]) -> Int {
   return d[0] & 1
 }
 
-func unpack25519(_ o:inout [Int64], _ n:[Int]) {	
-	for i in 0..<16 {
-		o[i] = Int64( n[2*i] + (n[2*i+1] << 8) )
-	}
-	o[15] = o[15] & 0x7fff
+func unpack25519(_ o:inout [Int64], _ n:[Int]) {    
+    for i in 0..<16 {
+        o[i] = Int64( n[2*i] + (n[2*i+1] << 8) )
+    }
+    o[15] = o[15] & 0x7fff
 }
 
 func A(_ o:inout [Int64], _ a:[Int64], _ b:[Int64]) {
-	for i in 0..<16 {
-		o[i] = a[i] + b[i]
-	}
+    for i in 0..<16 {
+        o[i] = a[i] + b[i]
+    }
 }
 
 func Z(_ o:inout [Int64], _ a:[Int64], _ b:[Int64]) {
-	for i in 0..<16 {
-		o[i] = a[i] - b[i]
-	}
+    for i in 0..<16 {
+        o[i] = a[i] - b[i]
+    }
 }
 
 // optimized by Miguel
@@ -189,161 +189,161 @@ func M(_ o:inout [Int64], _ a:[Int64], _ b:[Int64]) {
   var ab = [Int64](repeating: 0, count: 16)
     
   for i in 0..<16 {
-	  ab[i] = b[i]
+      ab[i] = b[i]
   }
     
   var v: Int64
   for i in 0..<16 {
-	  v = a[i]
-	  for j in 0..<16 {             
-		at[j+i] += v * ab[j]
-	  } 
+      v = a[i]
+      for j in 0..<16 {             
+        at[j+i] += v * ab[j]
+      } 
   }
   
   for i in 0..<15 {
-	  at[i] += 38 * at[i+16]
+      at[i] += 38 * at[i+16]
   }
   // t15 left as is  
         
   // first car
   var c: Int = 1
   for i in 0..<16 {            
-	  v =  at[i] + Int64( c + 65535 )
-	  c = Int( floor(Double(v) / 65536.0) )      
-	  at[i] = v - Int64( c * 65536 )
+      v =  at[i] + Int64( c + 65535 )
+      c = Int( floor(Double(v) / 65536.0) )      
+      at[i] = v - Int64( c * 65536 )
   } 
   at[0] += Int64( c-1 + 37 * (c-1) )
         
   // second car
   c = 1
   for i in 0..<16 {
-	  v =  at[i] + Int64( c + 65535 )
-	  c = Int( floor(Double(v) / 65536.0) )
-	  at[i] = v - Int64( c * 65536 )
+      v =  at[i] + Int64( c + 65535 )
+      c = Int( floor(Double(v) / 65536.0) )
+      at[i] = v - Int64( c * 65536 )
   }
   at[0] += Int64( c-1 + 37 * (c-1) )
     
   for i in 0..<16 {
-	  o[i] = at[i]
+      o[i] = at[i]
   }
     
 }
 
 func S(_ o:inout [Int64], _ a:[Int64]) {
-	M(&o, a, a)
+    M(&o, a, a)
 }
 
 func inv25519(_ o:inout [Int64], _ i:[Int64]) {      
     var c = gf()
-	for a in 0..<16 {
-		c[a] = i[a]
-	}
-	
+    for a in 0..<16 {
+        c[a] = i[a]
+    }
+    
     for a in (0..<254).reversed() {
-		S(&c, c)
-		if(a != 2 && a != 4) {
-			M(&c, c, i)
-		}
-	}
-	for a in 0..<16 {
-		o[a] = c[a]
-	}
+        S(&c, c)
+        if(a != 2 && a != 4) {
+            M(&c, c, i)
+        }
+    }
+    for a in 0..<16 {
+        o[a] = c[a]
+    }
 }
 
 func pow2523(_ o:inout [Int64], _ i:[Int64]) {
-	var c = gf()
-	for a in 0..<16 {
-		c[a] = i[a]
-	}
-	for a in (0...250).reversed() {
-		S(&c, c)
-		if(a != 1) {
-			M(&c, c, i)
-		}
-	}
-	for a in 0..<16 {
-		o[a] = c[a]
-	}
+    var c = gf()
+    for a in 0..<16 {
+        c[a] = i[a]
+    }
+    for a in (0...250).reversed() {
+        S(&c, c)
+        if(a != 1) {
+            M(&c, c, i)
+        }
+    }
+    for a in 0..<16 {
+        o[a] = c[a]
+    }
 }
 
 func crypto_scalarmult(_ q:inout [Int], _ n:[Int], _ p:[Int]) -> Int {
-	var z = [Int](repeating: 0, count: 32)
-	var x = [Int64](repeating: 0, count: 80)
-	var r: Int
-	
-	var a = gf()
-	var b = gf()
-	var c = gf()
-	var d = gf()
-	var e = gf()
-	var f = gf()
+    var z = [Int](repeating: 0, count: 32)
+    var x = [Int64](repeating: 0, count: 80)
+    var r: Int
+    
+    var a = gf()
+    var b = gf()
+    var c = gf()
+    var d = gf()
+    var e = gf()
+    var f = gf()
   
-	for i in 0..<31 {
-		z[i] = n[i]
-	}
-	z[31] = (n[31] & 127) | 64
-	z[0] = z[0] & 248
-	    
-	unpack25519(&x,p)
-	
-	for i in 0..<16 {
-		b[i] = x[i]
-		d[i] = 0
-		a[i] = 0
-		c[i] = 0
-	}   
-	a[0] = 1
-	d[0] = 1
+    for i in 0..<31 {
+        z[i] = n[i]
+    }
+    z[31] = (n[31] & 127) | 64
+    z[0] = z[0] & 248
+        
+    unpack25519(&x,p)
+    
+    for i in 0..<16 {
+        b[i] = x[i]
+        d[i] = 0
+        a[i] = 0
+        c[i] = 0
+    }   
+    a[0] = 1
+    d[0] = 1
             
-	for i in (0...254).reversed() {
+    for i in (0...254).reversed() {
                 
-		r = ( z[i >>> 3] >>> (i & 7) ) & 1 
+        r = ( z[i >>> 3] >>> (i & 7) ) & 1 
         
-		sel25519(&a,&b,r)
-		sel25519(&c,&d,r)	
+        sel25519(&a,&b,r)
+        sel25519(&c,&d,r)   
                                 
-		A(&e,a,c)
-		Z(&a,a,c)
-		A(&c,b,d)
-		Z(&b,b,d)
-		S(&d,e)
-		S(&f,a)
-		M(&a,c,a)
-		M(&c,b,e)
-		A(&e,a,c)
-		Z(&a,a,c)
-		S(&b,a)
-		Z(&c,d,f)
+        A(&e,a,c)
+        Z(&a,a,c)
+        A(&c,b,d)
+        Z(&b,b,d)
+        S(&d,e)
+        S(&f,a)
+        M(&a,c,a)
+        M(&c,b,e)
+        A(&e,a,c)
+        Z(&a,a,c)
+        S(&b,a)
+        Z(&c,d,f)
         
-		M(&a,c,_121665)
-		A(&a,a,d)
-		M(&c,c,a)
-		M(&a,d,f)
-		M(&d,b,x)
-		S(&b,e)
-		
+        M(&a,c,_121665)
+        A(&a,a,d)
+        M(&c,c,a)
+        M(&a,d,f)
+        M(&d,b,x)
+        S(&b,e)
+        
         sel25519(&a,&b,r)
         sel25519(&c,&d,r)
                 
-	}
-	        
-	for i in 0..<16 {
-		x[i+16]=a[i]
-		x[i+32]=c[i]
-		x[i+48]=b[i]
-		x[i+64]=d[i]
-	}
+    }
+            
+    for i in 0..<16 {
+        x[i+16]=a[i]
+        x[i+32]=c[i]
+        x[i+48]=b[i]
+        x[i+64]=d[i]
+    }
       
-	var x32 = Array(x[32..<x.count])
-	var x16 = Array(x[16..<x.count])
+    var x32 = Array(x[32..<x.count])
+    var x16 = Array(x[16..<x.count])
         
-	inv25519(&x32,x32)
-	
-	M(&x16,x16,x32)
-	
-	pack25519(&q,x16)
-	
-	return 0
+    inv25519(&x32,x32)
+    
+    M(&x16,x16,x32)
+    
+    pack25519(&q,x16)
+    
+    return 0
 }
 
 func crypto_scalarmult_base(_ q:inout [Int], _ n:[Int]) -> Int {
@@ -397,12 +397,12 @@ let K: [Int64] = [
 // optimized by miguel
 func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:Int) -> Int {
   
-	var wh = [Int](repeating: 0, count: 16)
-	var wl = [Int](repeating: 0, count: 16)
+    var wh = [Int](repeating: 0, count: 16)
+    var wl = [Int](repeating: 0, count: 16)
     
     var bh = [Int](repeating: 0, count: 8)
-	var bl = [Int](repeating: 0, count: 8)
-	    
+    var bl = [Int](repeating: 0, count: 8)
+        
     var th: Int
     var tl: Int
     var h: Int
@@ -411,306 +411,306 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
     var b: Int
     var c: Int
     var d: Int
-	
-	var ah = [Int](repeating: 0, count: 8)
-	var al = [Int](repeating: 0, count: 8)
-	for i in 0..<8 {
-		ah[i] = hh[i]
-		al[i] = hl[i]
-	}
-	
-	var pos = 0
-	var n = _n	    
-	while (n >= 128) {
+    
+    var ah = [Int](repeating: 0, count: 8)
+    var al = [Int](repeating: 0, count: 8)
+    for i in 0..<8 {
+        ah[i] = hh[i]
+        al[i] = hl[i]
+    }
+    
+    var pos = 0
+    var n = _n      
+    while (n >= 128) {
        
-		for i in 0..<16 {        
-		  let j = 8 * i + pos
+        for i in 0..<16 {        
+          let j = 8 * i + pos
           wh[i] = (m[j+0] << 24) | (m[j+1] << 16) | (m[j+2] << 8) | m[j+3]
-		  wl[i] = (m[j+4] << 24) | (m[j+5] << 16) | (m[j+6] << 8) | m[j+7]
-		}
+          wl[i] = (m[j+4] << 24) | (m[j+5] << 16) | (m[j+6] << 8) | m[j+7]
+        }
                 
-		for i in 0..<80 {
-		  for j in 0..<7 {
-			bh[j] = ah[j]
-			bl[j] = al[j]
-	      }		  
+        for i in 0..<80 {
+          for j in 0..<7 {
+            bh[j] = ah[j]
+            bl[j] = al[j]
+          }       
 
-		  // add
-		  h = ah[7]
-		  l = al[7]
+          // add
+          h = ah[7]
+          l = al[7]
 
-		  a = l & 0xffff; b = l >>> 16
-		  c = h & 0xffff; d = h >>> 16
+          a = l & 0xffff; b = l >>> 16
+          c = h & 0xffff; d = h >>> 16
 
-		  // Sigma1
-		  h = ((ah[4] >>> 14) | (al[4] << (32-14))) ^ ((ah[4] >>> 18) | (al[4] << (32-18))) ^ ((al[4] >>> (41-32)) | (ah[4] << (32-(41-32))))
-		  l = ((al[4] >>> 14) | (ah[4] << (32-14))) ^ ((al[4] >>> 18) | (ah[4] << (32-18))) ^ ((ah[4] >>> (41-32)) | (al[4] << (32-(41-32))))
+          // Sigma1
+          h = ((ah[4] >>> 14) | (al[4] << (32-14))) ^ ((ah[4] >>> 18) | (al[4] << (32-18))) ^ ((al[4] >>> (41-32)) | (ah[4] << (32-(41-32))))
+          l = ((al[4] >>> 14) | (ah[4] << (32-14))) ^ ((al[4] >>> 18) | (ah[4] << (32-18))) ^ ((ah[4] >>> (41-32)) | (al[4] << (32-(41-32))))
                       
-		  a += l & 0xffff
-		  b += l >>> 16
-		  c += h & 0xffff
-		  d += h >>> 16
-
-		  // Ch
-		  h = (ah[4] & ah[5]) ^ (~ah[4] & ah[6])
-		  l = (al[4] & al[5]) ^ (~al[4] & al[6])
-
-		  a += l & 0xffff; b += l >>> 16
-		  c += h & 0xffff; d += h >>> 16
-
-		  // K
-		  h = Int( getInt32( K[i*2] ) )
-		  l = Int( getInt32( K[i*2+1] ) )
-
-		  a += l & 0xffff
+          a += l & 0xffff
           b += l >>> 16
-		  c += h & 0xffff
+          c += h & 0xffff
           d += h >>> 16
 
-		  // w
-		  h = wh[i%16]
-		  l = wl[i%16]
+          // Ch
+          h = (ah[4] & ah[5]) ^ (~ah[4] & ah[6])
+          l = (al[4] & al[5]) ^ (~al[4] & al[6])
 
-		  a += l & 0xffff
-		  b += l >>> 16
-		  c += h & 0xffff
-		  d += h >>> 16
+          a += l & 0xffff; b += l >>> 16
+          c += h & 0xffff; d += h >>> 16
 
-		  b += a >>> 16
-		  c += b >>> 16
-		  d += c >>> 16
+          // K
+          h = Int( getInt32( K[i*2] ) )
+          l = Int( getInt32( K[i*2+1] ) )
+
+          a += l & 0xffff
+          b += l >>> 16
+          c += h & 0xffff
+          d += h >>> 16
+
+          // w
+          h = wh[i%16]
+          l = wl[i%16]
+
+          a += l & 0xffff
+          b += l >>> 16
+          c += h & 0xffff
+          d += h >>> 16
+
+          b += a >>> 16
+          c += b >>> 16
+          d += c >>> 16
 
           // *** R
-		  // th = c & 0xffff | ( d << 16 )
-		  // tl = a & 0xffff | ( b << 16 )
-		  th = c & 0xffff | d << 16 
-		  tl = a & 0xffff | b << 16 
+          // th = c & 0xffff | ( d << 16 )
+          // tl = a & 0xffff | ( b << 16 )
+          th = c & 0xffff | d << 16 
+          tl = a & 0xffff | b << 16 
          
-		  // add
-		  h = th
-		  l = tl
+          // add
+          h = th
+          l = tl
 
-		  a = l & 0xffff
-		  b = l >>> 16
-		  c = h & 0xffff
-		  d = h >>> 16
+          a = l & 0xffff
+          b = l >>> 16
+          c = h & 0xffff
+          d = h >>> 16
 
-		  // Sigma0
-		  h = ((ah[0] >>> 28) | (al[0] << (32-28))) ^ ((al[0] >>> (34-32)) | (ah[0] << (32-(34-32)))) ^ ((al[0] >>> (39-32)) | (ah[0] << (32-(39-32))))
-		  l = ((al[0] >>> 28) | (ah[0] << (32-28))) ^ ((ah[0] >>> (34-32)) | (al[0] << (32-(34-32)))) ^ ((ah[0] >>> (39-32)) | (al[0] << (32-(39-32))))
+          // Sigma0
+          h = ((ah[0] >>> 28) | (al[0] << (32-28))) ^ ((al[0] >>> (34-32)) | (ah[0] << (32-(34-32)))) ^ ((al[0] >>> (39-32)) | (ah[0] << (32-(39-32))))
+          l = ((al[0] >>> 28) | (ah[0] << (32-28))) ^ ((ah[0] >>> (34-32)) | (al[0] << (32-(34-32)))) ^ ((ah[0] >>> (39-32)) | (al[0] << (32-(39-32))))
 
-		  a += l & 0xffff
-		  b += l >>> 16
-		  c += h & 0xffff
-		  d += h >>> 16
+          a += l & 0xffff
+          b += l >>> 16
+          c += h & 0xffff
+          d += h >>> 16
 
-		  // Maj
-		  h = (ah[0] & ah[1]) ^ (ah[0] & ah[2]) ^ (ah[1] & ah[2])
-		  l = (al[0] & al[1]) ^ (al[0] & al[2]) ^ (al[1] & al[2])
+          // Maj
+          h = (ah[0] & ah[1]) ^ (ah[0] & ah[2]) ^ (ah[1] & ah[2])
+          l = (al[0] & al[1]) ^ (al[0] & al[2]) ^ (al[1] & al[2])
 
-		  a += l & 0xffff; b += l >>> 16
-		  c += h & 0xffff; d += h >>> 16
+          a += l & 0xffff; b += l >>> 16
+          c += h & 0xffff; d += h >>> 16
 
-		  b += a >>> 16
-		  c += b >>> 16
-		  d += c >>> 16
+          b += a >>> 16
+          c += b >>> 16
+          d += c >>> 16
 
-		  bh[7] = (c & 0xffff) | (d << 16)
-		  bl[7] = (a & 0xffff) | (b << 16)
+          bh[7] = (c & 0xffff) | (d << 16)
+          bl[7] = (a & 0xffff) | (b << 16)
 
-		  // add
-		  h = bh[3]
-		  l = bl[3]
+          // add
+          h = bh[3]
+          l = bl[3]
 
-		  a = l & 0xffff
-		  b = l >>> 16
-		  c = h & 0xffff
-		  d = h >>> 16
+          a = l & 0xffff
+          b = l >>> 16
+          c = h & 0xffff
+          d = h >>> 16
 
-		  h = th
-		  l = tl
+          h = th
+          l = tl
 
-		  a += l & 0xffff
-		  b += l >>> 16
-		  c += h & 0xffff
-		  d += h >>> 16
+          a += l & 0xffff
+          b += l >>> 16
+          c += h & 0xffff
+          d += h >>> 16
 
-		  b += a >>> 16
-		  c += b >>> 16
-		  d += c >>> 16
+          b += a >>> 16
+          c += b >>> 16
+          d += c >>> 16
 
-		  bh[3] = (c & 0xffff) | (d << 16)
-		  bl[3] = (a & 0xffff) | (b << 16)
+          bh[3] = (c & 0xffff) | (d << 16)
+          bl[3] = (a & 0xffff) | (b << 16)
 
-		  for j in 0..<8 {
-			  let k = ( j + 1 ) % 8
-			  ah[k] = bh[j]
-			  al[k] = bl[j]
-		  }
-		  
-		  if (i % 16 == 15) {
-			for j in 0..<16 {
-			  // add
-			  h = wh[j]
-			  l = wl[j]
+          for j in 0..<8 {
+              let k = ( j + 1 ) % 8
+              ah[k] = bh[j]
+              al[k] = bl[j]
+          }
+          
+          if (i % 16 == 15) {
+            for j in 0..<16 {
+              // add
+              h = wh[j]
+              l = wl[j]
 
-			  a = l & 0xffff; b = l >>> 16
-			  c = h & 0xffff; d = h >>> 16
+              a = l & 0xffff; b = l >>> 16
+              c = h & 0xffff; d = h >>> 16
 
-			  h = wh[(j+9)%16]
-			  l = wl[(j+9)%16]
+              h = wh[(j+9)%16]
+              l = wl[(j+9)%16]
 
-			  a += l & 0xffff; b += l >>> 16
-			  c += h & 0xffff; d += h >>> 16
+              a += l & 0xffff; b += l >>> 16
+              c += h & 0xffff; d += h >>> 16
 
-			  // sigma0
-			  th = wh[(j+1)%16]
-			  tl = wl[(j+1)%16]
-			  
-              h = ((th >>> 1) | (tl << (32-1))) ^ ((th >>> 8) | (tl << (32-8))) ^ (th >>> 7)
-			  l = ((tl >>> 1) | (th << (32-1))) ^ ((tl >>> 8) | (th << (32-8))) ^ ((tl >>> 7) | (th << (32-7)))
-
-			  a += l & 0xffff; b += l >>> 16
-			  c += h & 0xffff; d += h >>> 16
-
-			  // sigma1
-			  th = wh[(j+14)%16]
-			  tl = wl[(j+14)%16]
+              // sigma0
+              th = wh[(j+1)%16]
+              tl = wl[(j+1)%16]
               
-			  h = ((th >>> 19) | (tl << (32-19))) ^ ((tl >>> (61-32)) | (th << (32-(61-32)))) ^ (th >>> 6)
-			  l = ((tl >>> 19) | (th << (32-19))) ^ ((th >>> (61-32)) | (tl << (32-(61-32)))) ^ ((tl >>> 6) | (th << (32-6)))
+              h = ((th >>> 1) | (tl << (32-1))) ^ ((th >>> 8) | (tl << (32-8))) ^ (th >>> 7)
+              l = ((tl >>> 1) | (th << (32-1))) ^ ((tl >>> 8) | (th << (32-8))) ^ ((tl >>> 7) | (th << (32-7)))
 
-			  a += l & 0xffff; b += l >>> 16
-			  c += h & 0xffff; d += h >>> 16
+              a += l & 0xffff; b += l >>> 16
+              c += h & 0xffff; d += h >>> 16
 
-			  b += a >>> 16
-			  c += b >>> 16
-			  d += c >>> 16
+              // sigma1
+              th = wh[(j+14)%16]
+              tl = wl[(j+14)%16]
+              
+              h = ((th >>> 19) | (tl << (32-19))) ^ ((tl >>> (61-32)) | (th << (32-(61-32)))) ^ (th >>> 6)
+              l = ((tl >>> 19) | (th << (32-19))) ^ ((th >>> (61-32)) | (tl << (32-(61-32)))) ^ ((tl >>> 6) | (th << (32-6)))
 
-			  wh[j] = ( (c & 0xffff) | (d << 16) )
-			  wl[j] = ( (a & 0xffff) | (b << 16) )
-			}
-		  }
-		}
-                        	
+              a += l & 0xffff; b += l >>> 16
+              c += h & 0xffff; d += h >>> 16
+
+              b += a >>> 16
+              c += b >>> 16
+              d += c >>> 16
+
+              wh[j] = ( (c & 0xffff) | (d << 16) )
+              wl[j] = ( (a & 0xffff) | (b << 16) )
+            }
+          }
+        }
+                            
         // add
         a = 0; b = 0; c = 0; d = 0
         for k in 0..<8 {
-			if( k == 0 ) {
-				h = ah[0]
-				l = al[0]
-				a = l & 0xffff; b = l >>> 16
-				c = h & 0xffff; d = h >>> 16
-			}
-			
-			h = hh[k]
-			l = hl[k]
-			
-			a += l & 0xffff; b += l >>> 16
-			c += h & 0xffff; d += h >>> 16
+            if( k == 0 ) {
+                h = ah[0]
+                l = al[0]
+                a = l & 0xffff; b = l >>> 16
+                c = h & 0xffff; d = h >>> 16
+            }
+            
+            h = hh[k]
+            l = hl[k]
+            
+            a += l & 0xffff; b += l >>> 16
+            c += h & 0xffff; d += h >>> 16
 
-			b += a >>> 16
-			c += b >>> 16
-			d += c >>> 16
+            b += a >>> 16
+            c += b >>> 16
+            d += c >>> 16
 
-			hh[k] = (c & 0xffff) | (d << 16)
-			ah[k] = (c & 0xffff) | (d << 16)
-		
-			hl[k] = (a & 0xffff) | (b << 16)
-			al[k] = (a & 0xffff) | (b << 16)
-			
-			if( k < 7 ) {
-				h = ah[k+1]
-				l = al[k+1]
+            hh[k] = (c & 0xffff) | (d << 16)
+            ah[k] = (c & 0xffff) | (d << 16)
+        
+            hl[k] = (a & 0xffff) | (b << 16)
+            al[k] = (a & 0xffff) | (b << 16)
+            
+            if( k < 7 ) {
+                h = ah[k+1]
+                l = al[k+1]
 
-				a = l & 0xffff; b = l >>> 16
-				c = h & 0xffff; d = h >>> 16
-			}
-		}
-				
-		pos += 128
-		n -= 128
-	  }
+                a = l & 0xffff; b = l >>> 16
+                c = h & 0xffff; d = h >>> 16
+            }
+        }
+                
+        pos += 128
+        n -= 128
+      }
 
-	  return n
+      return n
 }
 
 var _HH: [Int64] = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]
 var _HL: [Int64] = [0xf3bcc908, 0x84caa73b, 0xfe94f82b, 0x5f1d36f1, 0xade682d1, 0x2b3e6c1f, 0xfb41bd6b, 0x137e2179]
 
 func toIntArray(_ o:[Int64]) -> [Int] {
-	var v = [Int]()
-	for i in 0..<o.count {
-		v.append( Int( getInt32( o[i] ) ) )
-	}
-	return v
+    var v = [Int]()
+    for i in 0..<o.count {
+        v.append( Int( getInt32( o[i] ) ) )
+    }
+    return v
 }
 
 func crypto_hash(_ out:inout [Int], _ m:[Int], _ _n: Int) -> Int {
-	var hh = toIntArray( _HH )
+    var hh = toIntArray( _HH )
     var hl = toIntArray( _HL )       
     var x = [Int](repeating: 0, count: 256)
     var  n = _n
     let b = n
        
-    _ =	crypto_hashblocks_hl(&hh, &hl, m, n)
+    _ = crypto_hashblocks_hl(&hh, &hl, m, n)
                     
-	n %= 128
+    n %= 128
 
-	for i in 0..<n {
-		x[i] = m[b-n+i]
-	}
-	x[n] = 128
-	
-	if( n<112 ) {
-		n = 256-128 * 1 
-	} else {
-		n = 256-128 * 0 
-	} 
-	x[n-9] = 0
-	        	
-	ts64(&x, n-8, ((b / 0x20000000) | 0), (b << 3) )
-		
-	_ = crypto_hashblocks_hl(&hh, &hl, x, n)
+    for i in 0..<n {
+        x[i] = m[b-n+i]
+    }
+    x[n] = 128
     
-	for i in 0..<8 {
-		ts64(&out, 8*i, hh[i], hl[i])
-	}
+    if( n<112 ) {
+        n = 256-128 * 1 
+    } else {
+        n = 256-128 * 0 
+    } 
+    x[n-9] = 0
+                
+    ts64(&x, n-8, ((b / 0x20000000) | 0), (b << 3) )
+        
+    _ = crypto_hashblocks_hl(&hh, &hl, x, n)
+    
+    for i in 0..<8 {
+        ts64(&out, 8*i, hh[i], hl[i])
+    }
 
-	return 0
-	
+    return 0
+    
 }
 
 func add(_ p: inout [[Int64]], _ q:[[Int64]]) {
-	var a = gf()
-	var b = gf()
-	var c = gf()
-	var d = gf()
-	var e = gf()
-	var f = gf()
-	var g = gf()
-	var h = gf()
-	var t = gf()
+    var a = gf()
+    var b = gf()
+    var c = gf()
+    var d = gf()
+    var e = gf()
+    var f = gf()
+    var g = gf()
+    var h = gf()
+    var t = gf()
 
-	Z(&a, p[1], p[0])
-	Z(&t, q[1], q[0])
-	M(&a, a, t)
-	A(&b, p[0], p[1])
-	A(&t, q[0], q[1])
-	M(&b, b, t)
-	M(&c, p[3], q[3])
-	M(&c, c, D2)
-	M(&d, p[2], q[2])
-	A(&d, d, d)
-	Z(&e, b, a)
-	Z(&f, d, c)
-	A(&g, d, c)
-	A(&h, b, a)
+    Z(&a, p[1], p[0])
+    Z(&t, q[1], q[0])
+    M(&a, a, t)
+    A(&b, p[0], p[1])
+    A(&t, q[0], q[1])
+    M(&b, b, t)
+    M(&c, p[3], q[3])
+    M(&c, c, D2)
+    M(&d, p[2], q[2])
+    A(&d, d, d)
+    Z(&e, b, a)
+    Z(&f, d, c)
+    A(&g, d, c)
+    A(&h, b, a)
 
-	M(&p[0], e, f)
-	M(&p[1], h, g)
-	M(&p[2], g, f)
-	M(&p[3], e, h)
+    M(&p[0], e, f)
+    M(&p[1], h, g)
+    M(&p[2], g, f)
+    M(&p[3], e, h)
 }
 
 func cswap(_ p:inout [[Int64]], _ q:inout [[Int64]], _ b:Int) {
@@ -736,20 +736,20 @@ func pack(_ r:inout [Int], _ p:[[Int64]]) {
 }
 
 func scalarmult(_ p:inout [[Int64]], _ q:inout [[Int64]], _ s:[Int]) {
-	var b: Int
+    var b: Int
   
-	set25519(&p[0], gf0)
-	set25519(&p[1], gf1)
-	set25519(&p[2], gf1)
-	set25519(&p[3], gf0)
+    set25519(&p[0], gf0)
+    set25519(&p[1], gf1)
+    set25519(&p[2], gf1)
+    set25519(&p[3], gf0)
   
-	for i in (0...255).reversed() {
-		b = ( s[(i/8) | 0] >> (i & 7)) & 1
-		cswap(&p, &q, b)
-		add(&q, p)
-		add(&p, p)
-		cswap(&p, &q, b)
-	}
+    for i in (0...255).reversed() {
+        b = ( s[(i/8) | 0] >> (i & 7)) & 1
+        cswap(&p, &q, b)
+        add(&q, p)
+        add(&p, p)
+        cswap(&p, &q, b)
+    }
 }
 
 func scalarbase(_ p:inout [[Int64]], _ s:[Int]) {
@@ -791,9 +791,9 @@ func modL(_ r:inout [Int], _ x:inout [Int]) {
   }
   
   for j in 0..<32 {
-	x[j] -= carry * L[j]
+    x[j] -= carry * L[j]
   }
-  	
+    
   for i in 0..<32 {
     x[i+1] += x[i] >> 8
     r[i] = x[i] & 255
@@ -818,7 +818,7 @@ func crypto_sign_direct(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int]) -> Int
   var r = [Int](repeating: 0, count: 64)
   var x = [Int](repeating: 0, count: 64)
   var p: [[Int64]] = [gf(), gf(), gf(), gf()]
-    	
+        
   for i in 0..<n {
     sm[64 + i] = m[i]
   }
@@ -826,7 +826,7 @@ func crypto_sign_direct(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int]) -> Int
   for i in 0..<32 {
     sm[32 + i] = sk[i]
   }
-  	
+    
   _ = crypto_hash(&r, Array(sm[32..<sm.count]), n+32)
       
   reduce(&r)
@@ -968,7 +968,7 @@ func curve25519_sign(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int], _ opt_rnd
   } else {
     smlen = crypto_sign_direct(&sm, m, n, edsk)
   }
-  	
+    
   // Copy sign bit from public key into signature.
   sm[63] = sm[63] | signBit
   return smlen
@@ -1018,7 +1018,7 @@ func unpackneg(_ r:inout [[Int64]], _ p:[Int]) -> Int {
   }
 
   if ( par25519(r[0]) == (p[31] >> 7) ) {
-	Z(&r[0], gf0, r[0])
+    Z(&r[0], gf0, r[0])
   }
 
   M(&r[3], r[0], r[1])
@@ -1113,142 +1113,142 @@ func curve25519_sign_open(_ m: inout [Int], _ sm: [Int], _ n: Int, _ pk: [Int]) 
 
 // Class
 class AxlSign {
-		
-	func sharedKey(secretKey: [Int], publicKey: [Int]) -> [Int] {
-	  var sharedKey = [Int](repeating: 0, count: 32)
-	  _ = crypto_scalarmult(&sharedKey, secretKey, publicKey)
-	  return sharedKey
-	}
+        
+    func sharedKey(secretKey: [Int], publicKey: [Int]) -> [Int] {
+      var sharedKey = [Int](repeating: 0, count: 32)
+      _ = crypto_scalarmult(&sharedKey, secretKey, publicKey)
+      return sharedKey
+    }
 
-	func signMessage(secretKey:[Int], msg:[Int], opt_random: [Int]?) -> [Int] {	  
-	  if (opt_random != nil ) {
-		var buf = [Int](repeating: 0, count: 128 + msg.count)
-		_ = curve25519_sign(&buf, msg, msg.count, secretKey, opt_random!)
-		return Array(buf[0..<64 + msg.count])
-	  } else {
-		var signedMsg = [Int](repeating: 0, count: 64 + msg.count)
-		_ = curve25519_sign(&signedMsg, msg, msg.count, secretKey, nil)
-		return signedMsg
-	  }
-	}
+    func signMessage(secretKey:[Int], msg:[Int], opt_random: [Int]?) -> [Int] {   
+      if (opt_random != nil ) {
+        var buf = [Int](repeating: 0, count: 128 + msg.count)
+        _ = curve25519_sign(&buf, msg, msg.count, secretKey, opt_random!)
+        return Array(buf[0..<64 + msg.count])
+      } else {
+        var signedMsg = [Int](repeating: 0, count: 64 + msg.count)
+        _ = curve25519_sign(&signedMsg, msg, msg.count, secretKey, nil)
+        return signedMsg
+      }
+    }
 
-	// add by Miguel
-	func openMessageStr(publicKey:[Int], signedMsg: [Int]) -> String {
-		var m = openMessage(publicKey: publicKey, signedMsg: signedMsg)
+    // add by Miguel
+    func openMessageStr(publicKey:[Int], signedMsg: [Int]) -> String {
+        var m = openMessage(publicKey: publicKey, signedMsg: signedMsg)
         var msg = ""
         for i in 0..<m.count {
             let value = m[i]
             msg += String( Character( UnicodeScalar( value )! ) )
         }
-        return msg			
-	}
+        return msg          
+    }
     
-	func openMessage(publicKey:[Int], signedMsg: [Int]) -> [Int] {
-	  var tmp = [Int](repeating: 0, count: signedMsg.count)
-	  let mlen = curve25519_sign_open(&tmp, signedMsg, signedMsg.count, publicKey)
-	  if (mlen < 0) {
-		print("fail: \(mlen) \n\n")
-		return []
-	  }
-	  var m = [Int](repeating: 0, count: mlen)
-	  for i in 0..<m.count {
-		m[i] = tmp[i]
-	  }
-	  return m  
-	}
-	
-	func sign(secretKey:[Int], msg:[Int], opt_random:[Int]?) -> [Int] {
-	  var len = 64
-	  if (opt_random != nil) {
-		len = 128
-	  } 	
-	  var buf = [Int](repeating: 0, count: len + msg.count)
-	  
-	  _ = curve25519_sign(&buf, msg, msg.count, secretKey, opt_random)  
-	  	  
-	  var signature = [Int](repeating: 0, count: 64)
-	  for i in 0..<signature.count {
-		signature[i] = buf[i]
-	  }
-	  return signature  
-	}
+    func openMessage(publicKey:[Int], signedMsg: [Int]) -> [Int] {
+      var tmp = [Int](repeating: 0, count: signedMsg.count)
+      let mlen = curve25519_sign_open(&tmp, signedMsg, signedMsg.count, publicKey)
+      if (mlen < 0) {
+        print("fail: \(mlen) \n\n")
+        return []
+      }
+      var m = [Int](repeating: 0, count: mlen)
+      for i in 0..<m.count {
+        m[i] = tmp[i]
+      }
+      return m  
+    }
+    
+    func sign(secretKey:[Int], msg:[Int], opt_random:[Int]?) -> [Int] {
+      var len = 64
+      if (opt_random != nil) {
+        len = 128
+      }     
+      var buf = [Int](repeating: 0, count: len + msg.count)
+      
+      _ = curve25519_sign(&buf, msg, msg.count, secretKey, opt_random)  
+          
+      var signature = [Int](repeating: 0, count: 64)
+      for i in 0..<signature.count {
+        signature[i] = buf[i]
+      }
+      return signature  
+    }
 
-	func verify(publicKey:[Int], msg:[Int], signature:[Int]) -> Int {
-	  var sm = [Int](repeating: 0, count: 64 + msg.count)
-	  var m = [Int](repeating: 0, count: 64 + msg.count)
-	 
-	  for i in 0..<64 {
-		sm[i] = signature[i]
-	  }
-	 
-	  for i in 0..<msg.count {
-		sm[i+64] = msg[i]
-	  }
-	  
-	  if ( curve25519_sign_open(&m, sm, sm.count, publicKey) >= 0 ) {
-		return 1
-	  } else {
-		return 0
-	  }
-	}
+    func verify(publicKey:[Int], msg:[Int], signature:[Int]) -> Int {
+      var sm = [Int](repeating: 0, count: 64 + msg.count)
+      var m = [Int](repeating: 0, count: 64 + msg.count)
+     
+      for i in 0..<64 {
+        sm[i] = signature[i]
+      }
+     
+      for i in 0..<msg.count {
+        sm[i+64] = msg[i]
+      }
+      
+      if ( curve25519_sign_open(&m, sm, sm.count, publicKey) >= 0 ) {
+        return 1
+      } else {
+        return 0
+      }
+    }
 
-	class Keys {
-		var publicKey: [Int]
-		var privateKey: [Int]       
+    class Keys {
+        var publicKey: [Int]
+        var privateKey: [Int]       
         init (pk: [Int], sk: [Int]) {
             publicKey = pk
             privateKey = sk 
         }
-	}
-	 
-	func generateKeyPair(_ seed: [Int]) -> Keys {
-	  var sk = [Int](repeating: 0, count: 32)
-	  var pk = [Int](repeating: 0, count: 32)
+    }
+     
+    func generateKeyPair(_ seed: [Int]) -> Keys {
+      var sk = [Int](repeating: 0, count: 32)
+      var pk = [Int](repeating: 0, count: 32)
 
-	  for i in 0..<32 {
-		sk[i] = seed[i]
-	  }
-			
+      for i in 0..<32 {
+        sk[i] = seed[i]
+      }
+            
       _ = crypto_scalarmult_base(&pk, sk)
 
-	  // Turn secret key into the correct format.
-	  sk[0] = sk[0] & 248
-	  sk[31] = sk[31] & 127
-	  sk[31] = sk[31] | 64
+      // Turn secret key into the correct format.
+      sk[0] = sk[0] & 248
+      sk[31] = sk[31] & 127
+      sk[31] = sk[31] | 64
 
-	  // Remove sign bit from public key.
-	  pk[31] = pk[31] & 127
-		
-	  return Keys(pk: pk, sk: sk)
-	  
-	}
+      // Remove sign bit from public key.
+      pk[31] = pk[31] & 127
+        
+      return Keys(pk: pk, sk: sk)
+      
+    }
 
-	func randomBytes(_ size: Int) -> [Int] {
-		let High: Int = 255
-		var seed = [Int](repeating: 0, count: size)
-		for i in 0..<seed.count {
-			seed[i] = Int(random() % (High + 1))
-		}
-		return seed
-	}
+    func randomBytes(_ size: Int) -> [Int] {
+        let High: Int = 255
+        var seed = [Int](repeating: 0, count: size)
+        for i in 0..<seed.count {
+            seed[i] = Int(random() % (High + 1))
+        }
+        return seed
+    }
     
 }
 
 func debug(_ text: String, _ array: [Int] ) {
-	var sum = 0
-	for value in array {
-		sum += value
-	}
-	print("\(text): [count:\(array.count), sum:\(sum)] - \(array)\n")
+    var sum = 0
+    for value in array {
+        sum += value
+    }
+    print("\(text): [count:\(array.count), sum:\(sum)] - \(array)\n")
 }
 
 func strToArray(_ text: String) -> [Int] {
-	var r = [Int]()
-	let a = Array(text.utf16)
-	for v in a {
-		r.append( Int(v) )
-	}
-	return r
+    var r = [Int]()
+    let a = Array(text.utf16)
+    for v in a {
+        r.append( Int(v) )
+    }
+    return r
 }
 
 // test 1. 25.06.17 19.30 hs
@@ -1264,7 +1264,7 @@ var axlsign = AxlSign()
 // static seed
 var seed = [Int](repeating: 0, count: 32)
 for i in 0..<32 {
-	seed[i] = 1 // i * 2
+    seed[i] = 1 // i * 2
 }
 
 // generate key pair
@@ -1295,4 +1295,4 @@ var msg2 = axlsign.openMessageStr(publicKey: keys.publicKey, signedMsg: sigmsg)
 
 print("respuesas: R1=\(res == 1 ? "SI" : "NO") R2=\(res1 == 1 ? "SI" : "NO")")
 print("msg2 = \(msg2)" )
-	
+    
