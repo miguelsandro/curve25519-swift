@@ -20,7 +20,7 @@ func getInt32(_ value: Int64) -> Int32 {
 
 func >>> (lhs: Int, rhs: Int) -> Int {
   let l = getInt32(Int64(lhs))
-  let r = getInt32(Int64(rhs))      
+  let r = getInt32(Int64(rhs))
   return Int( Int32(bitPattern: UInt32(bitPattern: l) >> UInt32(r)) )
 }
 
@@ -46,32 +46,32 @@ var gf1 = gf( [1] )
 
 var _121665 = gf( [0xdb41, 1] )
 
-var D = gf( [0x78a3, 0x1359, 0x4dca, 0x75eb, 
-             0xd8ab, 0x4141, 0x0a4d, 0x0070, 
-             0xe898, 0x7779, 0x4079, 0x8cc7, 
+var D = gf( [0x78a3, 0x1359, 0x4dca, 0x75eb,
+             0xd8ab, 0x4141, 0x0a4d, 0x0070,
+             0xe898, 0x7779, 0x4079, 0x8cc7,
              0xfe73, 0x2b6f, 0x6cee, 0x5203] )
 
-var D2 = gf( [0xf159, 0x26b2, 0x9b94, 0xebd6, 
-              0xb156, 0x8283, 0x149a, 0x00e0, 
-              0xd130, 0xeef3, 0x80f2, 0x198e, 
+var D2 = gf( [0xf159, 0x26b2, 0x9b94, 0xebd6,
+              0xb156, 0x8283, 0x149a, 0x00e0,
+              0xd130, 0xeef3, 0x80f2, 0x198e,
               0xfce7, 0x56df, 0xd9dc, 0x2406] )
 
-var X = gf( [0xd51a, 0x8f25, 0x2d60, 0xc956, 
-             0xa7b2, 0x9525, 0xc760, 0x692c, 
-             0xdc5c, 0xfdd6, 0xe231, 0xc0a4, 
+var X = gf( [0xd51a, 0x8f25, 0x2d60, 0xc956,
+             0xa7b2, 0x9525, 0xc760, 0x692c,
+             0xdc5c, 0xfdd6, 0xe231, 0xc0a4,
              0x53fe, 0xcd6e, 0x36d3, 0x2169] )
 
-var Y = gf( [0x6658, 0x6666, 0x6666, 0x6666, 
-             0x6666, 0x6666, 0x6666, 0x6666, 
-             0x6666, 0x6666, 0x6666, 0x6666, 
+var Y = gf( [0x6658, 0x6666, 0x6666, 0x6666,
+             0x6666, 0x6666, 0x6666, 0x6666,
+             0x6666, 0x6666, 0x6666, 0x6666,
              0x6666, 0x6666, 0x6666, 0x6666] )
 
-var I = gf( [0xa0b0, 0x4a0e, 0x1b27, 0xc4ee, 
-             0xe478, 0xad2f, 0x1806, 0x2f43, 
-             0xd7a7, 0x3dfb, 0x0099, 0x2b4d, 
+var I = gf( [0xa0b0, 0x4a0e, 0x1b27, 0xc4ee,
+             0xe478, 0xad2f, 0x1806, 0x2f43,
+             0xd7a7, 0x3dfb, 0x0099, 0x2b4d,
              0xdf0b, 0x4fc1, 0x2480, 0x2b83] )
 
-func ts64(_ x: inout [Int], _ i: Int, _ h:Int, _ l:Int) {    
+func ts64(_ x: inout [Int], _ i: Int, _ h:Int, _ l:Int) {
   x[i]   = ( (h >> 24) & 0xff )
   x[i+1] = ( (h >> 16) & 0xff )
   x[i+2] = ( (h >>  8) & 0xff )
@@ -125,14 +125,14 @@ func pack25519(_ o:inout [Int], _ n:[Int64]) {
     var b: Int64
     var m = gf()
     var t = gf()
-  
+
     for i in 0..<16 {
         t[i] = n[i]
     }
     car25519(&t)
     car25519(&t)
     car25519(&t)
-  
+
     for _ in 0...1 {
         m[0] = t[0] - 0xffed
         for i in 1...14 {
@@ -140,13 +140,13 @@ func pack25519(_ o:inout [Int], _ n:[Int64]) {
             m[i-1] = m[i-1] & 0xffff
         }
         m[15] = t[15] - 0x7fff - ((m[14] >> 16) & 1)
-        b = (m[15] >> 16) & 1        
+        b = (m[15] >> 16) & 1
         m[14] = m[14] & 0xffff
         sel25519(&t, &m, Int(1-b) )
     }
     for i in 0..<16 {
-        o[2*i] = Int(t[i]) & 0xff 
-        o[2*i+1] = Int(t[i]) >> 8 
+        o[2*i] = Int(t[i]) & 0xff
+        o[2*i+1] = Int(t[i]) >> 8
     }
 }
 
@@ -164,7 +164,7 @@ func par25519(_ a:[Int64]) -> Int {
   return d[0] & 1
 }
 
-func unpack25519(_ o:inout [Int64], _ n:[Int]) {    
+func unpack25519(_ o:inout [Int64], _ n:[Int]) {
     for i in 0..<16 {
         o[i] = Int64( n[2*i] + (n[2*i+1] << 8) )
     }
@@ -184,61 +184,61 @@ func Z(_ o:inout [Int64], _ a:[Int64], _ b:[Int64]) {
 }
 
 // optimized by Miguel
-func M(_ o:inout [Int64], _ a:[Int64], _ b:[Int64]) {    
+func M(_ o:inout [Int64], _ a:[Int64], _ b:[Int64]) {
   var at = [Int64](repeating: 0, count: 32)
   var ab = [Int64](repeating: 0, count: 16)
-    
+
   for i in 0..<16 {
       ab[i] = b[i]
   }
-    
+
   var v: Int64
   for i in 0..<16 {
       v = a[i]
-      for j in 0..<16 {             
+      for j in 0..<16 {
         at[j+i] += v * ab[j]
-      } 
+      }
   }
-  
+
   for i in 0..<15 {
       at[i] += 38 * at[i+16]
   }
-  // t15 left as is  
-        
+  // t15 left as is
+
   // first car
-  var c: Int = 1
-  for i in 0..<16 {            
-      v =  at[i] + Int64( c + 65535 )
-      c = Int( floor(Double(v) / 65536.0) )      
-      at[i] = v - Int64( c * 65536 )
-  } 
-  at[0] += Int64( c-1 + 37 * (c-1) )
-        
+  var c: Int64 = 1
+  for i in 0..<16 {
+      v = at[i] + c + 65535
+      c = Int64( floor(Double(v) / 65536.0) )
+      at[i] = v - c * 65536
+  }
+  at[0] += c-1 + 37 * (c-1)
+
   // second car
   c = 1
   for i in 0..<16 {
-      v =  at[i] + Int64( c + 65535 )
-      c = Int( floor(Double(v) / 65536.0) )
-      at[i] = v - Int64( c * 65536 )
+      v = at[i] + c + 65535
+      c = Int64( floor(Double(v) / 65536.0) )
+      at[i] = v - c * 65536
   }
-  at[0] += Int64( c-1 + 37 * (c-1) )
-    
+  at[0] += c-1 + 37 * (c-1)
+
   for i in 0..<16 {
       o[i] = at[i]
   }
-    
+
 }
 
 func S(_ o:inout [Int64], _ a:[Int64]) {
     M(&o, a, a)
 }
 
-func inv25519(_ o:inout [Int64], _ i:[Int64]) {      
+func inv25519(_ o:inout [Int64], _ i:[Int64]) {
     var c = gf()
     for a in 0..<16 {
         c[a] = i[a]
     }
-    
+
     for a in (0..<254).reversed() {
         S(&c, c)
         if(a != 2 && a != 4) {
@@ -270,38 +270,38 @@ func crypto_scalarmult(_ q:inout [Int], _ n:[Int], _ p:[Int]) -> Int {
     var z = [Int](repeating: 0, count: 32)
     var x = [Int64](repeating: 0, count: 80)
     var r: Int
-    
+
     var a = gf()
     var b = gf()
     var c = gf()
     var d = gf()
     var e = gf()
     var f = gf()
-  
+
     for i in 0..<31 {
         z[i] = n[i]
     }
     z[31] = (n[31] & 127) | 64
     z[0] = z[0] & 248
-        
+
     unpack25519(&x,p)
-    
+
     for i in 0..<16 {
         b[i] = x[i]
         d[i] = 0
         a[i] = 0
         c[i] = 0
-    }   
+    }
     a[0] = 1
     d[0] = 1
-            
+
     for i in (0...254).reversed() {
-                
-        r = ( z[i >>> 3] >>> (i & 7) ) & 1 
-        
+
+        r = ( z[i >>> 3] >>> (i & 7) ) & 1
+
         sel25519(&a,&b,r)
-        sel25519(&c,&d,r)   
-                                
+        sel25519(&c,&d,r)
+
         A(&e,a,c)
         Z(&a,a,c)
         A(&c,b,d)
@@ -314,35 +314,35 @@ func crypto_scalarmult(_ q:inout [Int], _ n:[Int], _ p:[Int]) -> Int {
         Z(&a,a,c)
         S(&b,a)
         Z(&c,d,f)
-        
+
         M(&a,c,_121665)
         A(&a,a,d)
         M(&c,c,a)
         M(&a,d,f)
         M(&d,b,x)
         S(&b,e)
-        
+
         sel25519(&a,&b,r)
         sel25519(&c,&d,r)
-                
+
     }
-            
+
     for i in 0..<16 {
         x[i+16]=a[i]
         x[i+32]=c[i]
         x[i+48]=b[i]
         x[i+64]=d[i]
     }
-      
+
     var x32 = Array(x[32..<x.count])
     var x16 = Array(x[16..<x.count])
-        
+
     inv25519(&x32,x32)
-    
+
     M(&x16,x16,x32)
-    
+
     pack25519(&q,x16)
-    
+
     return 0
 }
 
@@ -396,13 +396,13 @@ let K: [Int64] = [
 
 // optimized by miguel
 func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:Int) -> Int {
-  
+
     var wh = [Int](repeating: 0, count: 16)
     var wl = [Int](repeating: 0, count: 16)
-    
+
     var bh = [Int](repeating: 0, count: 8)
     var bl = [Int](repeating: 0, count: 8)
-        
+
     var th: Int
     var tl: Int
     var h: Int
@@ -411,29 +411,29 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
     var b: Int
     var c: Int
     var d: Int
-    
+
     var ah = [Int](repeating: 0, count: 8)
     var al = [Int](repeating: 0, count: 8)
     for i in 0..<8 {
         ah[i] = hh[i]
         al[i] = hl[i]
     }
-    
+
     var pos = 0
-    var n = _n      
+    var n = _n
     while (n >= 128) {
-       
-        for i in 0..<16 {        
+
+        for i in 0..<16 {
           let j = 8 * i + pos
           wh[i] = (m[j+0] << 24) | (m[j+1] << 16) | (m[j+2] << 8) | m[j+3]
           wl[i] = (m[j+4] << 24) | (m[j+5] << 16) | (m[j+6] << 8) | m[j+7]
         }
-                
+
         for i in 0..<80 {
           for j in 0..<7 {
             bh[j] = ah[j]
             bl[j] = al[j]
-          }       
+          }
 
           // add
           h = ah[7]
@@ -445,7 +445,7 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
           // Sigma1
           h = ((ah[4] >>> 14) | (al[4] << (32-14))) ^ ((ah[4] >>> 18) | (al[4] << (32-18))) ^ ((al[4] >>> (41-32)) | (ah[4] << (32-(41-32))))
           l = ((al[4] >>> 14) | (ah[4] << (32-14))) ^ ((al[4] >>> 18) | (ah[4] << (32-18))) ^ ((ah[4] >>> (41-32)) | (al[4] << (32-(41-32))))
-                      
+
           a += l & 0xffff
           b += l >>> 16
           c += h & 0xffff
@@ -483,9 +483,9 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
           // *** R
           // th = c & 0xffff | ( d << 16 )
           // tl = a & 0xffff | ( b << 16 )
-          th = c & 0xffff | d << 16 
-          tl = a & 0xffff | b << 16 
-         
+          th = c & 0xffff | d << 16
+          tl = a & 0xffff | b << 16
+
           // add
           h = th
           l = tl
@@ -547,7 +547,7 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
               ah[k] = bh[j]
               al[k] = bl[j]
           }
-          
+
           if (i % 16 == 15) {
             for j in 0..<16 {
               // add
@@ -566,7 +566,7 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
               // sigma0
               th = wh[(j+1)%16]
               tl = wl[(j+1)%16]
-              
+
               h = ((th >>> 1) | (tl << (32-1))) ^ ((th >>> 8) | (tl << (32-8))) ^ (th >>> 7)
               l = ((tl >>> 1) | (th << (32-1))) ^ ((tl >>> 8) | (th << (32-8))) ^ ((tl >>> 7) | (th << (32-7)))
 
@@ -576,7 +576,7 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
               // sigma1
               th = wh[(j+14)%16]
               tl = wl[(j+14)%16]
-              
+
               h = ((th >>> 19) | (tl << (32-19))) ^ ((tl >>> (61-32)) | (th << (32-(61-32)))) ^ (th >>> 6)
               l = ((tl >>> 19) | (th << (32-19))) ^ ((th >>> (61-32)) | (tl << (32-(61-32)))) ^ ((tl >>> 6) | (th << (32-6)))
 
@@ -592,7 +592,7 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
             }
           }
         }
-                            
+
         // add
         a = 0; b = 0; c = 0; d = 0
         for k in 0..<8 {
@@ -602,10 +602,10 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
                 a = l & 0xffff; b = l >>> 16
                 c = h & 0xffff; d = h >>> 16
             }
-            
+
             h = hh[k]
             l = hl[k]
-            
+
             a += l & 0xffff; b += l >>> 16
             c += h & 0xffff; d += h >>> 16
 
@@ -615,10 +615,10 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
 
             hh[k] = (c & 0xffff) | (d << 16)
             ah[k] = (c & 0xffff) | (d << 16)
-        
+
             hl[k] = (a & 0xffff) | (b << 16)
             al[k] = (a & 0xffff) | (b << 16)
-            
+
             if( k < 7 ) {
                 h = ah[k+1]
                 l = al[k+1]
@@ -627,7 +627,7 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
                 c = h & 0xffff; d = h >>> 16
             }
         }
-                
+
         pos += 128
         n -= 128
       }
@@ -648,37 +648,37 @@ func toIntArray(_ o:[Int64]) -> [Int] {
 
 func crypto_hash(_ out:inout [Int], _ m:[Int], _ _n: Int) -> Int {
     var hh = toIntArray( _HH )
-    var hl = toIntArray( _HL )       
+    var hl = toIntArray( _HL )
     var x = [Int](repeating: 0, count: 256)
     var  n = _n
     let b = n
-       
+
     _ = crypto_hashblocks_hl(&hh, &hl, m, n)
-                    
+
     n %= 128
 
     for i in 0..<n {
         x[i] = m[b-n+i]
     }
     x[n] = 128
-    
+
     if( n<112 ) {
-        n = 256-128 * 1 
+        n = 256-128 * 1
     } else {
-        n = 256-128 * 0 
-    } 
+        n = 256-128 * 0
+    }
     x[n-9] = 0
-                
+
     ts64(&x, n-8, ((b / 0x20000000) | 0), (b << 3) )
-        
+
     _ = crypto_hashblocks_hl(&hh, &hl, x, n)
-    
+
     for i in 0..<8 {
         ts64(&out, 8*i, hh[i], hl[i])
     }
 
     return 0
-    
+
 }
 
 func add(_ p: inout [[Int64]], _ q:[[Int64]]) {
@@ -723,26 +723,26 @@ func pack(_ r:inout [Int], _ p:[[Int64]]) {
   var tx = gf()
   var ty = gf()
   var zi = gf()
-    
+
   inv25519(&zi, p[2])
-  
+
   M(&tx, p[0], zi)
   M(&ty, p[1], zi)
-    
+
   pack25519(&r, ty)
-    
+
   r[31] = r[31] ^ ( par25519(tx) << 7 )
-    
+
 }
 
 func scalarmult(_ p:inout [[Int64]], _ q:inout [[Int64]], _ s:[Int]) {
     var b: Int
-  
+
     set25519(&p[0], gf0)
     set25519(&p[1], gf1)
     set25519(&p[2], gf1)
     set25519(&p[3], gf0)
-  
+
     for i in (0...255).reversed() {
         b = ( s[(i/8) | 0] >> (i & 7)) & 1
         cswap(&p, &q, b)
@@ -757,18 +757,18 @@ func scalarbase(_ p:inout [[Int64]], _ s:[Int]) {
   set25519(&q[0], X)
   set25519(&q[1], Y)
   set25519(&q[2], gf1)
-  M(&q[3], X, Y) 
+  M(&q[3], X, Y)
   scalarmult(&p, &q, s)
 }
 
-var L: [Int] = [ 0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 
-                 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 
+var L: [Int] = [ 0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
+                 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14,
                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x10 ]
 
 func modL(_ r:inout [Int], _ x:inout [Int]) {
-  
+
   var carry: Int
-    
+
   for i in (32...63).reversed() {
     carry = 0
     var j = i - 32
@@ -777,28 +777,28 @@ func modL(_ r:inout [Int], _ x:inout [Int]) {
       x[j] += carry - 16 * x[i] * L[j - (i - 32)]
       carry = (x[j] + 128) >> 8
       x[j] -= carry * 256
-      j += 1 
-    }    
+      j += 1
+    }
     x[j] += carry
     x[i] = 0
   }
-  
+
   carry = 0
   for j in 0..<32 {
     x[j] += carry - (x[31] >> 4) * L[j]
     carry = x[j] >> 8
     x[j] = x[j] & 255
   }
-  
+
   for j in 0..<32 {
     x[j] -= carry * L[j]
   }
-    
+
   for i in 0..<32 {
     x[i+1] += x[i] >> 8
     r[i] = x[i] & 255
   }
-  
+
 }
 
 func reduce(_ r:inout [Int]) {
@@ -808,7 +808,7 @@ func reduce(_ r:inout [Int]) {
   }
   for i in 0..<64 {
     r[i] = 0
-  }  
+  }
   modL(&r, &x)
 }
 
@@ -818,52 +818,52 @@ func crypto_sign_direct(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int]) -> Int
   var r = [Int](repeating: 0, count: 64)
   var x = [Int](repeating: 0, count: 64)
   var p: [[Int64]] = [gf(), gf(), gf(), gf()]
-        
+
   for i in 0..<n {
     sm[64 + i] = m[i]
   }
-  
+
   for i in 0..<32 {
     sm[32 + i] = sk[i]
   }
-    
+
   _ = crypto_hash(&r, Array(sm[32..<sm.count]), n+32)
-      
+
   reduce(&r)
-  
+
   _ = scalarbase(&p, r)
-    
+
   pack(&sm, p)
-    
+
   for i in 0..<32 {
     sm[i + 32] = sk[32 + i]
   }
-  
+
   _ = crypto_hash(&h, sm, n + 64)
   reduce(&h)
 
   for i in 0..<64 {
     x[i] = 0
   }
-  
+
   for i in 0..<32 {
     x[i] = r[i]
   }
-  
+
   for i in 0..<32 {
     for j in 0..<32 {
       x[i+j] += h[i] * sk[j]
     }
   }
-  
+
   var tmp = Array(sm[32..<sm.count])
-  modL(&tmp, &x) 
+  modL(&tmp, &x)
   for i in 0..<tmp.count {
     sm[32+i] = tmp[i]
-  }  
-    
+  }
+
   return n + 64
-  
+
 }
 
 // Note: sm must be n+128.
@@ -902,7 +902,7 @@ func crypto_sign_direct_rnd(_ sm:inout [Int], _ m:[Int], _ n: Int, _ sk:[Int], _
   for i in 0..<32 {
     sm[i + 32] = sk[32 + i]
   }
-    
+
   _ = crypto_hash(&h, sm, n + 64)
   reduce(&h)
 
@@ -914,11 +914,11 @@ func crypto_sign_direct_rnd(_ sm:inout [Int], _ m:[Int], _ n: Int, _ sk:[Int], _
   for i in 0..<64 {
     x[i] = 0
   }
-  
+
   for i in 0..<32 {
     x[i] = r[i]
   }
-    
+
   for i in 0..<32 {
     for j in 0..<32 {
       x[i+j] += h[i] * sk[j]
@@ -926,10 +926,10 @@ func crypto_sign_direct_rnd(_ sm:inout [Int], _ m:[Int], _ n: Int, _ sk:[Int], _
   }
 
   var tmp = Array(sm[32...n+64])
-  modL(&tmp, &x) 
+  modL(&tmp, &x)
   for i in 0..<tmp.count {
     sm[32+i] = tmp[i]
-  }  
+  }
 
   return n + 64
 }
@@ -950,15 +950,15 @@ func curve25519_sign(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int], _ opt_rnd
   edsk[0] = edsk[0] & 248
   edsk[31] = edsk[31] & 127
   edsk[31] = edsk[31] | 64
-   
-  scalarbase(&p, edsk)  
-    
+
+  scalarbase(&p, edsk)
+
   var tmp = Array(edsk[32..<edsk.count])
-  pack(&tmp, p)  
+  pack(&tmp, p)
   for i in 0..<tmp.count {
     edsk[32+i] = tmp[i]
   }
-    
+
   // Remember sign bit.
   let signBit = edsk[63] & 128
   var smlen: Int
@@ -968,7 +968,7 @@ func curve25519_sign(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int], _ opt_rnd
   } else {
     smlen = crypto_sign_direct(&sm, m, n, edsk)
   }
-    
+
   // Copy sign bit from public key into signature.
   sm[63] = sm[63] | signBit
   return smlen
@@ -985,7 +985,7 @@ func unpackneg(_ r:inout [[Int64]], _ p:[Int]) -> Int {
 
   set25519(&r[2], gf1)
   unpack25519(&r[1], p)
-    
+
   S(&num, r[1])
   M(&den, num, D)
   Z(&num, num, r[2])
@@ -996,13 +996,13 @@ func unpackneg(_ r:inout [[Int64]], _ p:[Int]) -> Int {
   M(&den6, den4, den2)
   M(&t, den6, num)
   M(&t, t, den)
-  
+
   pow2523(&t, t)
   M(&t, t, num)
   M(&t, t, den)
   M(&t, t, den)
   M(&r[0], t, den)
-  
+
   S(&chk, r[0])
   M(&chk, chk, den)
 
@@ -1012,7 +1012,7 @@ func unpackneg(_ r:inout [[Int64]], _ p:[Int]) -> Int {
 
   S(&chk, r[0])
   M(&chk, chk, den)
-  
+
   if ( neq25519(chk, num) != 0 ) {
     return -1
   }
@@ -1022,7 +1022,7 @@ func unpackneg(_ r:inout [[Int64]], _ p:[Int]) -> Int {
   }
 
   M(&r[3], r[0], r[1])
-   
+
   return 0
 }
 
@@ -1032,29 +1032,29 @@ func crypto_sign_open(_ m: inout [Int], _ sm:[Int], _ _n:Int, _ pk:[Int]) -> Int
   var p: [[Int64]] = [gf(), gf(), gf(), gf()]
   var q: [[Int64]] = [gf(), gf(), gf(), gf()]
   var n = _n
-  
+
   var mlen = -1
   if (n < 64) {
     return mlen
   }
- 
+
   if ( unpackneg(&q, pk) != 0 ) {
     return mlen
   }
-  
+
   for i in 0..<n {
     m[i] = sm[i]
   }
-  
+
   for i in 0..<32 {
     m[i+32] = pk[i]
   }
-    
-  _ = crypto_hash(&h, m, n)   
-  
-  reduce(&h)      
-  scalarmult(&p, &q, h)    
-  
+
+  _ = crypto_hash(&h, m, n)
+
+  reduce(&h)
+  scalarmult(&p, &q, h)
+
   scalarbase(&q, Array(sm[32..<sm.count]) )
   add(&p, q)
   pack(&t, p)
@@ -1070,10 +1070,10 @@ func crypto_sign_open(_ m: inout [Int], _ sm:[Int], _ _n:Int, _ pk:[Int]) -> Int
   for i in 0..<n {
     m[i] = sm[i + 64]
   }
-  
+
   mlen = n
   return mlen
-  
+
 }
 
 // Converts Curve25519 public key back to Ed25519 public key.
@@ -1098,13 +1098,13 @@ func convertPublicKey(_ pk: [Int]) -> [Int] {
 func curve25519_sign_open(_ m: inout [Int], _ sm: [Int], _ n: Int, _ pk: [Int]) -> Int {
   // Convert Curve25519 public key into Ed25519 public key.
   var edpk = convertPublicKey(pk)
-    
+
   // Restore sign bit from signature.
   edpk[31] = edpk[31] | ( sm[63] & 128)
 
   // Remove sign bit from signature.
-  var _sm =  Array(sm[0..<sm.count]) 
-  
+  var _sm =  Array(sm[0..<sm.count])
+
   _sm[63] = _sm[63] & 127
 
   // Verify signed message.
@@ -1113,14 +1113,14 @@ func curve25519_sign_open(_ m: inout [Int], _ sm: [Int], _ n: Int, _ pk: [Int]) 
 
 // Class
 class AxlSign {
-        
+
     func sharedKey(secretKey: [Int], publicKey: [Int]) -> [Int] {
       var sharedKey = [Int](repeating: 0, count: 32)
       _ = crypto_scalarmult(&sharedKey, secretKey, publicKey)
       return sharedKey
     }
 
-    func signMessage(secretKey:[Int], msg:[Int], opt_random: [Int]?) -> [Int] {   
+    func signMessage(secretKey:[Int], msg:[Int], opt_random: [Int]?) -> [Int] {
       if (opt_random != nil ) {
         var buf = [Int](repeating: 0, count: 128 + msg.count)
         _ = curve25519_sign(&buf, msg, msg.count, secretKey, opt_random!)
@@ -1140,9 +1140,9 @@ class AxlSign {
             let value = m[i]
             msg += String( Character( UnicodeScalar( value )! ) )
         }
-        return msg          
+        return msg
     }
-    
+
     func openMessage(publicKey:[Int], signedMsg: [Int]) -> [Int] {
       var tmp = [Int](repeating: 0, count: signedMsg.count)
       let mlen = curve25519_sign_open(&tmp, signedMsg, signedMsg.count, publicKey)
@@ -1154,37 +1154,37 @@ class AxlSign {
       for i in 0..<m.count {
         m[i] = tmp[i]
       }
-      return m  
+      return m
     }
-    
+
     func sign(secretKey:[Int], msg:[Int], opt_random:[Int]?) -> [Int] {
       var len = 64
       if (opt_random != nil) {
         len = 128
-      }     
+      }
       var buf = [Int](repeating: 0, count: len + msg.count)
-      
-      _ = curve25519_sign(&buf, msg, msg.count, secretKey, opt_random)  
-          
+
+      _ = curve25519_sign(&buf, msg, msg.count, secretKey, opt_random)
+
       var signature = [Int](repeating: 0, count: 64)
       for i in 0..<signature.count {
         signature[i] = buf[i]
       }
-      return signature  
+      return signature
     }
 
     func verify(publicKey:[Int], msg:[Int], signature:[Int]) -> Int {
       var sm = [Int](repeating: 0, count: 64 + msg.count)
       var m = [Int](repeating: 0, count: 64 + msg.count)
-     
+
       for i in 0..<64 {
         sm[i] = signature[i]
       }
-     
+
       for i in 0..<msg.count {
         sm[i+64] = msg[i]
       }
-      
+
       if ( curve25519_sign_open(&m, sm, sm.count, publicKey) >= 0 ) {
         return 1
       } else {
@@ -1194,13 +1194,13 @@ class AxlSign {
 
     class Keys {
         var publicKey: [Int]
-        var privateKey: [Int]       
+        var privateKey: [Int]
         init (pk: [Int], sk: [Int]) {
             publicKey = pk
-            privateKey = sk 
+            privateKey = sk
         }
     }
-     
+
     func generateKeyPair(_ seed: [Int]) -> Keys {
       var sk = [Int](repeating: 0, count: 32)
       var pk = [Int](repeating: 0, count: 32)
@@ -1208,7 +1208,7 @@ class AxlSign {
       for i in 0..<32 {
         sk[i] = seed[i]
       }
-            
+
       _ = crypto_scalarmult_base(&pk, sk)
 
       // Turn secret key into the correct format.
@@ -1218,9 +1218,9 @@ class AxlSign {
 
       // Remove sign bit from public key.
       pk[31] = pk[31] & 127
-        
+
       return Keys(pk: pk, sk: sk)
-      
+
     }
 
     func randomBytes(_ size: Int) -> [Int] {
@@ -1231,7 +1231,7 @@ class AxlSign {
         }
         return seed
     }
-    
+
 }
 
 func debug(_ text: String, _ array: [Int] ) {
@@ -1259,30 +1259,22 @@ func strToArray(_ text: String) -> [Int] {
 var axlsign = AxlSign()
 
 // random seed
-// var seed = axlsign.randomBytes(32)
+var seed = axlsign.randomBytes(32)
 
 // static seed
-var seed = [Int](repeating: 0, count: 32)
-for i in 0..<32 {
-    seed[i] = 1 // i * 2
-}
+// var seed = [Int](repeating: 0, count: 32); for i in 0..<32 { seed[i] = 1 // i * 2 }
 
 // generate key pair
 var keys = axlsign.generateKeyPair(seed)
 
-// var rnd = axlsign.randomBytes(64)
-var rnd = [Int](repeating: 1, count: 64)
-
-// var msg = [Int](repeating: 65, count: 12)
+var rnd = axlsign.randomBytes(64)
 var msg = strToArray("lo esencial es invisible a los ojos !...")
-// var msg = [Int](repeating: 1, count: 12)
 
 var sig = axlsign.sign(secretKey: keys.privateKey, msg: msg, opt_random: rnd)
 var res = axlsign.verify(publicKey: keys.publicKey, msg: msg, signature: sig)
 var res1 = axlsign.verify(publicKey:keys.privateKey, msg: msg, signature: sig)
 
 var sigmsg = axlsign.signMessage(secretKey: keys.privateKey, msg: msg, opt_random: rnd)
-// var amsg2 = axlsign.openMessage(publicKey: keys.publicKey, signedMsg: sigmsg)
 var msg2 = axlsign.openMessageStr(publicKey: keys.publicKey, signedMsg: sigmsg)
 
 // debug("seed", seed)
@@ -1295,4 +1287,4 @@ var msg2 = axlsign.openMessageStr(publicKey: keys.publicKey, signedMsg: sigmsg)
 
 print("respuesas: R1=\(res == 1 ? "SI" : "NO") R2=\(res1 == 1 ? "SI" : "NO")")
 print("msg2 = \(msg2)" )
-    
+
