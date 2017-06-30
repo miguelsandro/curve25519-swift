@@ -36,8 +36,8 @@ func gf(_ ai: [Int64]) -> [Int64] {
     return r
 }
 
-var _0 = [Int](repeating: 0, count: 16)
-var _9 = [Int](repeating: 0, count: 32)
+var _0 = [UInt8](repeating: 0, count: 16)
+var _9 = [UInt8](repeating: 0, count: 32)
 _9[0] = 0x9
 
 var gf0 = gf()
@@ -71,26 +71,26 @@ var I = gf( [0xa0b0, 0x4a0e, 0x1b27, 0xc4ee,
              0xd7a7, 0x3dfb, 0x0099, 0x2b4d,
              0xdf0b, 0x4fc1, 0x2480, 0x2b83] )
 
-func ts64(_ x: inout [Int], _ i: Int, _ h:Int, _ l:Int) {
-  x[i]   = ( (h >> 24) & 0xff )
-  x[i+1] = ( (h >> 16) & 0xff )
-  x[i+2] = ( (h >>  8) & 0xff )
-  x[i+3] = ( h & 0xff )
-  x[i+4] = ( (l >> 24) & 0xff )
-  x[i+5] = ( (l >> 16) & 0xff )
-  x[i+6] = ( (l >>  8) & 0xff )
-  x[i+7] = ( l & 0xff )
+func ts64(_ x: inout [UInt8], _ i: Int, _ h:Int, _ l:Int) {
+  x[i]   = UInt8( (h >> 24) & 0xff )
+  x[i+1] = UInt8( (h >> 16) & 0xff )
+  x[i+2] = UInt8( (h >>  8) & 0xff )
+  x[i+3] = UInt8( h & 0xff )
+  x[i+4] = UInt8( (l >> 24) & 0xff )
+  x[i+5] = UInt8( (l >> 16) & 0xff )
+  x[i+6] = UInt8 ( (l >>  8) & 0xff )
+  x[i+7] = UInt8( l & 0xff )
 }
 
-func vn(_ x:[Int], _ xi:Int, _ y:[Int], _ yi:Int, _ n:Int) -> Int {
-    var d: Int = 0
+func vn(_ x:[UInt8], _ xi:Int, _ y:[UInt8], _ yi:Int, _ n:Int) -> Int {
+    var d: UInt8 = 0
     for i in 0..<n {
         d = d | ( x[xi+i] ^ y[yi+i] )
     }
-    return (1 & ( (d - 1 ) >>> 8 ) ) - 1
+    return (1 & ( ( Int(d) - 1 ) >>> 8 ) ) - 1
 }
 
-func crypto_verify_32(_ x:[Int], _ xi:Int, _ y:[Int], _ yi:Int) -> Int {
+func crypto_verify_32(_ x:[UInt8], _ xi:Int, _ y:[UInt8], _ yi:Int) -> Int {
   return vn(x,xi,y,yi,32)
 }
 
@@ -121,7 +121,7 @@ func sel25519(_ p:inout [Int64], _ q:inout [Int64], _ b:Int) {
     }
 }
 
-func pack25519(_ o:inout [Int], _ n:[Int64]) {
+func pack25519(_ o:inout [UInt8], _ n:[Int64]) {
     var b: Int64
     var m = gf()
     var t = gf()
@@ -145,28 +145,28 @@ func pack25519(_ o:inout [Int], _ n:[Int64]) {
         sel25519(&t, &m, Int(1-b) )
     }
     for i in 0..<16 {
-        o[2*i] = Int(t[i]) & 0xff
-        o[2*i+1] = Int(t[i]) >> 8
+        o[2*i] = UInt8(t[i] & 0xff ) // *** R
+        o[2*i+1] = UInt8(t[i] >> 8 ) // *** R
     }
 }
 
 func neq25519(_ a:[Int64], _ b:[Int64]) -> Int {
-  var c = [Int](repeating: 0, count: 32)
-  var d = [Int](repeating: 0, count: 32)
+  var c = [UInt8](repeating: 0, count: 32)
+  var d = [UInt8](repeating: 0, count: 32)
   pack25519(&c, a)
   pack25519(&d, b)
   return crypto_verify_32(c, 0, d, 0)
 }
 
 func par25519(_ a:[Int64]) -> Int {
-  var d = [Int](repeating: 0, count: 32)
+  var d = [UInt8](repeating: 0, count: 32)
   pack25519(&d, a)
-  return d[0] & 1
+  return Int(d[0]) & 1
 }
 
-func unpack25519(_ o:inout [Int64], _ n:[Int]) {
+func unpack25519(_ o:inout [Int64], _ n:[UInt8]) {
     for i in 0..<16 {
-        o[i] = Int64( n[2*i] + (n[2*i+1] << 8) )
+        o[i] = Int64(n[2*i]) + ( Int64(n[2*i+1]) << 8) // *** R 
     }
     o[15] = o[15] & 0x7fff
 }
@@ -266,8 +266,8 @@ func pow2523(_ o:inout [Int64], _ i:[Int64]) {
     }
 }
 
-func crypto_scalarmult(_ q:inout [Int], _ n:[Int], _ p:[Int]) -> Int {
-    var z = [Int](repeating: 0, count: 32)
+func crypto_scalarmult(_ q:inout [UInt8], _ n:[UInt8], _ p:[UInt8]) -> Int {
+    var z = [UInt8](repeating: 0, count: 32)
     var x = [Int64](repeating: 0, count: 80)
     var r: Int
 
@@ -283,9 +283,9 @@ func crypto_scalarmult(_ q:inout [Int], _ n:[Int], _ p:[Int]) -> Int {
     }
     z[31] = (n[31] & 127) | 64
     z[0] = z[0] & 248
-
+    
     unpack25519(&x,p)
-
+    
     for i in 0..<16 {
         b[i] = x[i]
         d[i] = 0
@@ -296,8 +296,8 @@ func crypto_scalarmult(_ q:inout [Int], _ n:[Int], _ p:[Int]) -> Int {
     d[0] = 1
 
     for i in (0...254).reversed() {
-
-        r = ( z[i >>> 3] >>> (i & 7) ) & 1
+                
+        r = ( Int(z[i >>> 3]) >>> (i & 7) ) & 1
 
         sel25519(&a,&b,r)
         sel25519(&c,&d,r)
@@ -338,7 +338,7 @@ func crypto_scalarmult(_ q:inout [Int], _ n:[Int], _ p:[Int]) -> Int {
     var x16 = Array(x[16..<x.count])
 
     inv25519(&x32,x32)
-
+    
     M(&x16,x16,x32)
 
     pack25519(&q,x16)
@@ -346,7 +346,7 @@ func crypto_scalarmult(_ q:inout [Int], _ n:[Int], _ p:[Int]) -> Int {
     return 0
 }
 
-func crypto_scalarmult_base(_ q:inout [Int], _ n:[Int]) -> Int {
+func crypto_scalarmult_base(_ q:inout [UInt8], _ n:[UInt8]) -> Int {
   return crypto_scalarmult(&q, n, _9)
 }
 
@@ -395,7 +395,7 @@ let K: [Int64] = [
 ]
 
 // optimized by miguel
-func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:Int) -> Int {
+func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[UInt8], _ _n:Int) -> Int {
 
     var wh = [Int](repeating: 0, count: 16)
     var wl = [Int](repeating: 0, count: 16)
@@ -425,8 +425,8 @@ func crypto_hashblocks_hl(_ hh: inout [Int], _ hl: inout [Int], _ m:[Int], _ _n:
 
         for i in 0..<16 {
           let j = 8 * i + pos
-          wh[i] = (m[j+0] << 24) | (m[j+1] << 16) | (m[j+2] << 8) | m[j+3]
-          wl[i] = (m[j+4] << 24) | (m[j+5] << 16) | (m[j+6] << 8) | m[j+7]
+          wh[i] = (Int(m[j+0]) << 24) | (Int(m[j+1]) << 16) | (Int(m[j+2]) << 8) | Int(m[j+3]) // *** R
+          wl[i] = (Int(m[j+4]) << 24) | (Int(m[j+5]) << 16) | (Int(m[j+6]) << 8) | Int(m[j+7]) // *** R
         }
 
         for i in 0..<80 {
@@ -646,15 +646,15 @@ func toIntArray(_ o:[Int64]) -> [Int] {
     return v
 }
 
-func crypto_hash(_ out:inout [Int], _ m:[Int], _ _n: Int) -> Int {
+func crypto_hash(_ out:inout [UInt8], _ m:[UInt8], _ _n: Int) -> Int {
     var hh = toIntArray( _HH )
     var hl = toIntArray( _HL )
-    var x = [Int](repeating: 0, count: 256)
+    var x = [UInt8](repeating: 0, count: 256)
     var  n = _n
     let b = n
-
+    
     _ = crypto_hashblocks_hl(&hh, &hl, m, n)
-
+    
     n %= 128
 
     for i in 0..<n {
@@ -719,7 +719,7 @@ func cswap(_ p:inout [[Int64]], _ q:inout [[Int64]], _ b:Int) {
   }
 }
 
-func pack(_ r:inout [Int], _ p:[[Int64]]) {
+func pack(_ r:inout [UInt8], _ p:[[Int64]]) {
   var tx = gf()
   var ty = gf()
   var zi = gf()
@@ -731,11 +731,11 @@ func pack(_ r:inout [Int], _ p:[[Int64]]) {
 
   pack25519(&r, ty)
 
-  r[31] = r[31] ^ ( par25519(tx) << 7 )
+  r[31] = r[31] ^ UInt8( par25519(tx) << 7 )
 
 }
 
-func scalarmult(_ p:inout [[Int64]], _ q:inout [[Int64]], _ s:[Int]) {
+func scalarmult(_ p:inout [[Int64]], _ q:inout [[Int64]], _ s:[UInt8]) {
     var b: Int
 
     set25519(&p[0], gf0)
@@ -744,7 +744,7 @@ func scalarmult(_ p:inout [[Int64]], _ q:inout [[Int64]], _ s:[Int]) {
     set25519(&p[3], gf0)
 
     for i in (0...255).reversed() {
-        b = ( s[(i/8) | 0] >> (i & 7)) & 1
+        b = ( Int(s[(i/8) | 0]) >> (i & 7)) & 1 // *** R
         cswap(&p, &q, b)
         add(&q, p)
         add(&p, p)
@@ -752,7 +752,7 @@ func scalarmult(_ p:inout [[Int64]], _ q:inout [[Int64]], _ s:[Int]) {
     }
 }
 
-func scalarbase(_ p:inout [[Int64]], _ s:[Int]) {
+func scalarbase(_ p:inout [[Int64]], _ s:[UInt8]) {
   var q: [[Int64]] = [gf(), gf(), gf(), gf()]
   set25519(&q[0], X)
   set25519(&q[1], Y)
@@ -761,13 +761,13 @@ func scalarbase(_ p:inout [[Int64]], _ s:[Int]) {
   scalarmult(&p, &q, s)
 }
 
-var L: [Int] = [ 0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
+var L: [Int64] = [ 0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58,
                  0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14,
                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x10 ]
 
-func modL(_ r:inout [Int], _ x:inout [Int]) {
+func modL(_ r:inout [UInt8], _ x:inout [Int64]) {
 
-  var carry: Int
+  var carry: Int64
 
   for i in (32...63).reversed() {
     carry = 0
@@ -796,15 +796,15 @@ func modL(_ r:inout [Int], _ x:inout [Int]) {
 
   for i in 0..<32 {
     x[i+1] += x[i] >> 8
-    r[i] = x[i] & 255
+    r[i] = UInt8( x[i] & 255 ) // *** R
   }
 
 }
 
-func reduce(_ r:inout [Int]) {
-  var x = [Int](repeating: 0, count: 64)
+func reduce(_ r:inout [UInt8]) {
+  var x = [Int64](repeating: 0, count: 64)
   for i in 0..<64 {
-    x[i] = r[i]
+    x[i] = Int64( r[i] ) // *** R
   }
   for i in 0..<64 {
     r[i] = 0
@@ -813,10 +813,10 @@ func reduce(_ r:inout [Int]) {
 }
 
 // Like crypto_sign, but uses secret key directly in hash.
-func crypto_sign_direct(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int]) -> Int {
-  var h = [Int](repeating: 0, count: 64)
-  var r = [Int](repeating: 0, count: 64)
-  var x = [Int](repeating: 0, count: 64)
+func crypto_sign_direct(_ sm:inout [UInt8], _ m:[UInt8], _ n:Int, _ sk:[UInt8]) -> Int {
+  var h = [UInt8](repeating: 0, count: 64)
+  var r = [UInt8](repeating: 0, count: 64)
+  var x = [Int64](repeating: 0, count: 64)
   var p: [[Int64]] = [gf(), gf(), gf(), gf()]
 
   for i in 0..<n {
@@ -847,12 +847,12 @@ func crypto_sign_direct(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int]) -> Int
   }
 
   for i in 0..<32 {
-    x[i] = r[i]
+    x[i] = Int64(r[i]) // *** R
   }
 
   for i in 0..<32 {
     for j in 0..<32 {
-      x[i+j] += h[i] * sk[j]
+      x[i+j] += Int64( h[i] ) * Int64( sk[j] ) // *** R
     }
   }
 
@@ -867,10 +867,10 @@ func crypto_sign_direct(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int]) -> Int
 }
 
 // Note: sm must be n+128.
-func crypto_sign_direct_rnd(_ sm:inout [Int], _ m:[Int], _ n: Int, _ sk:[Int], _ rnd:[Int]) -> Int {
-  var h = [Int](repeating: 0, count: 64)
-  var r = [Int](repeating: 0, count: 64)
-  var x = [Int](repeating: 0, count: 64)
+func crypto_sign_direct_rnd(_ sm:inout [UInt8], _ m:[UInt8], _ n: Int, _ sk:[UInt8], _ rnd:[UInt8]) -> Int {
+  var h = [UInt8](repeating: 0, count: 64)
+  var r = [UInt8](repeating: 0, count: 64)
+  var x = [Int64](repeating: 0, count: 64)
   var p: [[Int64]] = [gf(), gf(), gf(), gf()]
 
   // Hash separation.
@@ -895,6 +895,7 @@ func crypto_sign_direct_rnd(_ sm:inout [Int], _ m:[Int], _ n: Int, _ sk:[Int], _
   }
 
   _ = crypto_hash(&r, sm, n+128)
+  
   reduce(&r)
   scalarbase(&p, r)
   pack(&sm, p)
@@ -905,7 +906,7 @@ func crypto_sign_direct_rnd(_ sm:inout [Int], _ m:[Int], _ n: Int, _ sk:[Int], _
 
   _ = crypto_hash(&h, sm, n + 64)
   reduce(&h)
-
+  
   // Wipe out random suffix.
   for i in 0..<64 {
     sm[n + 64 + i] = 0
@@ -916,12 +917,12 @@ func crypto_sign_direct_rnd(_ sm:inout [Int], _ m:[Int], _ n: Int, _ sk:[Int], _
   }
 
   for i in 0..<32 {
-    x[i] = r[i]
+    x[i] = Int64( r[i] ) // *** R
   }
 
   for i in 0..<32 {
     for j in 0..<32 {
-      x[i+j] += h[i] * sk[j]
+      x[i+j] += Int64( h[i] ) * Int64( sk[j] ) // *** R 
     }
   }
 
@@ -934,12 +935,12 @@ func crypto_sign_direct_rnd(_ sm:inout [Int], _ m:[Int], _ n: Int, _ sk:[Int], _
   return n + 64
 }
 
-func curve25519_sign(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int], _ opt_rnd:[Int]?) -> Int {
+func curve25519_sign(_ sm:inout [UInt8], _ m:[UInt8], _ n:Int, _ sk:[UInt8], _ opt_rnd:[UInt8]?) -> Int {
   // If opt_rnd is provided, sm must have n + 128,
   // otherwise it must have n + 64 bytes.
 
   // Convert Curve25519 secret key into Ed25519 secret key (includes pub key).
-  var edsk = [Int](repeating: 0, count: 64)
+  var edsk = [UInt8](repeating: 0, count: 64)
   var p: [[Int64]] = [gf(), gf(), gf(), gf()]
 
   for i in 0..<32 {
@@ -952,7 +953,7 @@ func curve25519_sign(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int], _ opt_rnd
   edsk[31] = edsk[31] | 64
 
   scalarbase(&p, edsk)
-
+    
   var tmp = Array(edsk[32..<edsk.count])
   pack(&tmp, p)
   for i in 0..<tmp.count {
@@ -974,7 +975,7 @@ func curve25519_sign(_ sm:inout [Int], _ m:[Int], _ n:Int, _ sk:[Int], _ opt_rnd
   return smlen
 }
 
-func unpackneg(_ r:inout [[Int64]], _ p:[Int]) -> Int {
+func unpackneg(_ r:inout [[Int64]], _ p:[UInt8]) -> Int {
   var t = gf()
   var chk = gf()
   var num = gf()
@@ -1017,7 +1018,7 @@ func unpackneg(_ r:inout [[Int64]], _ p:[Int]) -> Int {
     return -1
   }
 
-  if ( par25519(r[0]) == (p[31] >> 7) ) {
+  if ( par25519(r[0]) == (Int(p[31]) >> 7) ) { // *** R
     Z(&r[0], gf0, r[0])
   }
 
@@ -1026,9 +1027,9 @@ func unpackneg(_ r:inout [[Int64]], _ p:[Int]) -> Int {
   return 0
 }
 
-func crypto_sign_open(_ m: inout [Int], _ sm:[Int], _ _n:Int, _ pk:[Int]) -> Int {
-  var t = [Int](repeating: 0, count: 32)
-  var h = [Int](repeating: 0, count: 64)
+func crypto_sign_open(_ m: inout [UInt8], _ sm:[UInt8], _ _n:Int, _ pk:[UInt8]) -> Int {
+  var t = [UInt8](repeating: 0, count: 32)
+  var h = [UInt8](repeating: 0, count: 64)
   var p: [[Int64]] = [gf(), gf(), gf(), gf()]
   var q: [[Int64]] = [gf(), gf(), gf(), gf()]
   var n = _n
@@ -1078,8 +1079,8 @@ func crypto_sign_open(_ m: inout [Int], _ sm:[Int], _ _n:Int, _ pk:[Int]) -> Int
 
 // Converts Curve25519 public key back to Ed25519 public key.
 // edwardsY = (montgomeryX - 1) / (montgomeryX + 1)
-func convertPublicKey(_ pk: [Int]) -> [Int] {
-  var z = [Int](repeating: 0, count: 32)
+func convertPublicKey(_ pk: [UInt8]) -> [UInt8] {
+  var z = [UInt8](repeating: 0, count: 32)
   var x = gf()
   var a = gf()
   var b = gf()
@@ -1095,7 +1096,7 @@ func convertPublicKey(_ pk: [Int]) -> [Int] {
   return z
 }
 
-func curve25519_sign_open(_ m: inout [Int], _ sm: [Int], _ n: Int, _ pk: [Int]) -> Int {
+func curve25519_sign_open(_ m: inout [UInt8], _ sm: [UInt8], _ n: Int, _ pk: [UInt8]) -> Int {
   // Convert Curve25519 public key into Ed25519 public key.
   var edpk = convertPublicKey(pk)
 
@@ -1114,68 +1115,68 @@ func curve25519_sign_open(_ m: inout [Int], _ sm: [Int], _ n: Int, _ pk: [Int]) 
 // Class
 class AxlSign {
 
-    func sharedKey(secretKey: [Int], publicKey: [Int]) -> [Int] {
-      var sharedKey = [Int](repeating: 0, count: 32)
+    func sharedKey(secretKey: [UInt8], publicKey: [UInt8]) -> [UInt8] {
+      var sharedKey = [UInt8](repeating: 0, count: 32)
       _ = crypto_scalarmult(&sharedKey, secretKey, publicKey)
       return sharedKey
     }
 
-    func signMessage(secretKey:[Int], msg:[Int], opt_random: [Int]?) -> [Int] {
+    func signMessage(secretKey:[UInt8], msg:[UInt8], opt_random: [UInt8]?) -> [UInt8] {
       if (opt_random != nil ) {
-        var buf = [Int](repeating: 0, count: 128 + msg.count)
+        var buf = [UInt8](repeating: 0, count: 128 + msg.count)
         _ = curve25519_sign(&buf, msg, msg.count, secretKey, opt_random!)
         return Array(buf[0..<64 + msg.count])
       } else {
-        var signedMsg = [Int](repeating: 0, count: 64 + msg.count)
+        var signedMsg = [UInt8](repeating: 0, count: 64 + msg.count)
         _ = curve25519_sign(&signedMsg, msg, msg.count, secretKey, nil)
         return signedMsg
       }
     }
 
     // add by Miguel
-    func openMessageStr(publicKey:[Int], signedMsg: [Int]) -> String {
+    func openMessageStr(publicKey:[UInt8], signedMsg: [UInt8]) -> String {
         var m = openMessage(publicKey: publicKey, signedMsg: signedMsg)
         var msg = ""
         for i in 0..<m.count {
-            let value = m[i]
+            let value = Int( m[i] )
             msg += String( Character( UnicodeScalar( value )! ) )
         }
         return msg
     }
-
-    func openMessage(publicKey:[Int], signedMsg: [Int]) -> [Int] {
-      var tmp = [Int](repeating: 0, count: signedMsg.count)
+    
+    func openMessage(publicKey:[UInt8], signedMsg: [UInt8]) -> [UInt8] {
+      var tmp = [UInt8](repeating: 0, count: signedMsg.count)
       let mlen = curve25519_sign_open(&tmp, signedMsg, signedMsg.count, publicKey)
       if (mlen < 0) {
         print("fail: \(mlen) \n\n")
         return []
       }
-      var m = [Int](repeating: 0, count: mlen)
+      var m = [UInt8](repeating: 0, count: mlen)
       for i in 0..<m.count {
         m[i] = tmp[i]
       }
       return m
     }
 
-    func sign(secretKey:[Int], msg:[Int], opt_random:[Int]?) -> [Int] {
+    func sign(secretKey:[UInt8], msg:[UInt8], opt_random:[UInt8]?) -> [UInt8] {
       var len = 64
       if (opt_random != nil) {
         len = 128
       }
-      var buf = [Int](repeating: 0, count: len + msg.count)
+      var buf = [UInt8](repeating: 0, count: len + msg.count)
 
       _ = curve25519_sign(&buf, msg, msg.count, secretKey, opt_random)
 
-      var signature = [Int](repeating: 0, count: 64)
+      var signature = [UInt8](repeating: 0, count: 64)
       for i in 0..<signature.count {
         signature[i] = buf[i]
       }
       return signature
     }
 
-    func verify(publicKey:[Int], msg:[Int], signature:[Int]) -> Int {
-      var sm = [Int](repeating: 0, count: 64 + msg.count)
-      var m = [Int](repeating: 0, count: 64 + msg.count)
+    func verify(publicKey:[UInt8], msg:[UInt8], signature:[UInt8]) -> Int {
+      var sm = [UInt8](repeating: 0, count: 64 + msg.count)
+      var m = [UInt8](repeating: 0, count: 64 + msg.count)
 
       for i in 0..<64 {
         sm[i] = signature[i]
@@ -1193,17 +1194,17 @@ class AxlSign {
     }
 
     class Keys {
-        var publicKey: [Int]
-        var privateKey: [Int]
-        init (pk: [Int], sk: [Int]) {
+        var publicKey: [UInt8]
+        var privateKey: [UInt8]
+        init (pk: [UInt8], sk: [UInt8]) {
             publicKey = pk
             privateKey = sk
         }
     }
 
-    func generateKeyPair(_ seed: [Int]) -> Keys {
-      var sk = [Int](repeating: 0, count: 32)
-      var pk = [Int](repeating: 0, count: 32)
+    func generateKeyPair(_ seed: [UInt8]) -> Keys {
+      var sk = [UInt8](repeating: 0, count: 32)
+      var pk = [UInt8](repeating: 0, count: 32)
 
       for i in 0..<32 {
         sk[i] = seed[i]
@@ -1223,38 +1224,42 @@ class AxlSign {
 
     }
 
-    func randomBytes(_ size: Int) -> [Int] {
+    func randomBytes(_ size: Int) -> [UInt8] {
         let High: Int = 255
-        var seed = [Int](repeating: 0, count: size)
+        var seed = [UInt8](repeating: 0, count: size)
         for i in 0..<seed.count {
-            seed[i] = Int(random() % (High + 1))
+            seed[i] = UInt8(random() % (High + 1))
         }
         return seed
     }
 
 }
 
-func debug(_ text: String, _ array: [Int] ) {
+func debug(_ text: String, _ array: [UInt8] ) {
     var sum = 0
     for value in array {
-        sum += value
+        sum += Int( value )
     }
     print("\(text): [count:\(array.count), sum:\(sum)] - \(array)\n")
 }
 
-func strToArray(_ text: String) -> [Int] {
-    var r = [Int]()
+func strToArray(_ text: String) -> [UInt8] {
+    var r = [UInt8]()
     let a = Array(text.utf16)
     for v in a {
-        r.append( Int(v) )
+        r.append( UInt8(v) )
     }
     return r
 }
+
 
 // test 1. 25.06.17 19.30 hs
 // test 2. 25.06.17 20.48 hs
 // test 3. 25.06.17 12.41 hs - ubuntu swift 3.1.1
 // test 4. 25.06.17 18.00 hs - exito !!!!
+// test UInt8 -> 29.06.17 22.30 hs.
+
+print("Versiòn UInt8")
 
 var axlsign = AxlSign()
 
@@ -1268,7 +1273,7 @@ var seed = axlsign.randomBytes(32)
 var keys = axlsign.generateKeyPair(seed)
 
 var rnd = axlsign.randomBytes(64)
-var msg = strToArray("lo esencial es invisible a los ojos !...")
+var msg = strToArray("lo esencial es invisible a los ojos !... moÑo àè")
 
 var sig = axlsign.sign(secretKey: keys.privateKey, msg: msg, opt_random: rnd)
 var res = axlsign.verify(publicKey: keys.publicKey, msg: msg, signature: sig)
@@ -1287,4 +1292,5 @@ var msg2 = axlsign.openMessageStr(publicKey: keys.publicKey, signedMsg: sigmsg)
 
 print("respuesas: R1=\(res == 1 ? "SI" : "NO") R2=\(res1 == 1 ? "SI" : "NO")")
 print("msg2 = \(msg2)" )
+
 
