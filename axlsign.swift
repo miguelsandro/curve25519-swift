@@ -1275,7 +1275,7 @@ var seed = axlsign.randomBytes(32)
 var keys = axlsign.generateKeyPair(seed)
 
 var rnd = axlsign.randomBytes(64)
-var msg = strToArray("lo esencial es invisible a los ojos !... moÑo àè")
+var msg = strToArray("¡lo esencial es invisible a los ojos !")
 
 var sig = axlsign.sign(secretKey: keys.privateKey, msg: msg, opt_random: rnd)
 var res = axlsign.verify(publicKey: keys.publicKey, msg: msg, signature: sig)
